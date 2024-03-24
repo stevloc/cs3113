@@ -182,10 +182,10 @@ void LevelA::render(ShaderProgram *program)
     Utility::draw_text(program, font_texture_id, std::string("KILL: JUMP ON TOP"), 0.3f, 0.001f, glm::vec3(1.0f, -1.5f, 0.0f));
     
     if (game_over){
-        Utility::draw_text(program, font_texture_id, std::string("GAME OVER"), 0.5f, 0.0f, m_state.player->get_position());
+        Utility::draw_text(program, font_texture_id, std::string("You Lose"), 0.5f, 0.0f, m_state.player->get_position());
     }
     if (game_won){
-        Utility::draw_text(program, font_texture_id, std::string("YOU WIN"), 0.5f, 0.0f, m_state.player->get_position());
+        Utility::draw_text(program, font_texture_id, std::string("You Win"), 0.5f, 0.0f, m_state.player->get_position());
     }
     
 }
