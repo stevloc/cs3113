@@ -14,7 +14,7 @@
 #define LEVEL_WIDTH 17
 #define LEVEL_HEIGHT 8
 
-unsigned int LEVEL_DATA[] =
+unsigned int LEVELA_DATA[] =
 {
 
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
@@ -22,9 +22,9 @@ unsigned int LEVEL_DATA[] =
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
-    36,  0,  0,  0, 16,  0,  0, 13,  0,  0, 14,  0,  0, 17,  0,  0, 36,
-    36,  0,  0, 17, 34, 19,  0,  0,  0,  0,  0,  0,  0, 33, 34,  0, 36,
-    36, 17, 18, 34, 34, 34, 18, 18, 18, 18, 18, 18, 18, 18, 18,  0, 36
+    36,  0,  0,  0, 16,  0,  0, 13,  0,  0, 14,  0,  0, 20,  0,  0, 36,
+    36,  0,  0, 17, 34, 19,  0,  0,  0,  0,  0,  0,  0, 52, 82,  0, 36,
+    36, 17, 18, 34, 34, 34, 18, 18, 18, 18, 18, 18, 18, 18, 19,  0, 36
 };
 
 LevelA::~LevelA()
@@ -36,10 +36,11 @@ LevelA::~LevelA()
     Mix_FreeMusic(m_state.bgm);
 }
 
-void LevelA::initialise()
-{
+void LevelA::initialise(int lives) {
+    m_state.next_scene_id = -1;
+    n_lives = lives;
     GLuint map_texture_id = Utility::load_texture("assets/tileset.png");
-    m_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_DATA, map_texture_id, 1.0f, 16, 7);
+    m_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVELA_DATA, map_texture_id, 1.0f, 16, 7);
     
     // Code from main.cpp's initialise()
     /**
@@ -140,6 +141,8 @@ void LevelA::initialise()
     m_state.jump_sfx = Mix_LoadWAV("assets/jumpsound.mp3");
     Mix_PlayMusic(m_state.bgm, -1);
     Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+    
+
  
 }
 
@@ -147,20 +150,25 @@ void LevelA::update(float delta_time)
 {
     m_state.player->update(delta_time, m_state.player, m_state.enemies, ENEMY_COUNT, m_state.map);
 
-    for (int i = 0; i < ENEMY_COUNT; i++)
-    {
+    for (int i = 0; i < ENEMY_COUNT; i++) {
         m_state.enemies[i].update(delta_time, m_state.player, NULL, NULL, m_state.map);
     }
-    
-    int temp_count = 0;
-    for (size_t i = 0; i < ENEMY_COUNT ; i++){
-        if (!m_state.enemies[i].isActive()) temp_count++;
+
+    if (!(m_state.player->isActive())){
+        n_lives -= 1;
+        if (n_lives <= 0) {
+            m_state.next_scene_id = 4;
+        } else {
+            m_state.player->activate();
+            m_state.player->set_position(glm::vec3(1.0f, 0.0f, 0.0f));
+        }
+        return;
     }
     
-    if (m_state.player->lives <= 0) game_over = true;
+    if (m_state.player->get_position().y < -10.0f) m_state.next_scene_id = 2;
+
     
 }
-
 
 void LevelA::render(ShaderProgram *program)
 {
@@ -173,11 +181,11 @@ void LevelA::render(ShaderProgram *program)
             m_state.enemies[i].render(program);
         }
     }
-    Utility::draw_text(program, font_texture_id, std::to_string(m_state.player->lives), 0.5f, 0.0f, m_state.player->get_position());
-
-    if (game_over){
-        Utility::draw_text(program, font_texture_id, std::string("You Lose"), 0.5f, 0.0f, m_state.player->get_position());
-    }
+    
+    Utility::draw_text(program, font_texture_id, std::to_string(n_lives), 0.5f, 0.0f, m_state.player->get_position());
+    
+    Utility::draw_text(program, font_texture_id, std::string("PRESS P TO PAUSE"), 0.4f, 0.0f, glm::vec3(2.0f, -1.5f, 0.0f));
+//    Utility::draw_text(program, font_texture_id, std::string("TO PAUSE"), 0.2f, 0.0f, glm::vec3(-1.5f, 2.0f, 0.0f));
 
 }
 

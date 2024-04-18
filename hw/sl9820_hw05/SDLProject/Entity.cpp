@@ -276,7 +276,7 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
             float x_overlap = fabs(x_distance - (m_width / 2.0f) - (other->get_width() / 2.0f));
 
             if (get_entity_type() == PLAYER && other->get_entity_type() == ENEMY) {
-                lives -= 1;
+                deactivate();
             }
 
             if (m_velocity.x > 0) {

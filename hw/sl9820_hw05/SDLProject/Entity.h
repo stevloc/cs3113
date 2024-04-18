@@ -7,6 +7,8 @@
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
 **/
+
+#pragma once
 #include "Map.h"
 
 enum EntityType { PLATFORM, PLAYER, ENEMY };
@@ -67,8 +69,6 @@ public:
         m_animation_index   = 0,
         m_animation_cols    = 0,
         m_animation_rows    = 0;
-    
-    int lives = 3;
 
     int*    m_animation_indices = NULL;
     float   m_animation_time = 0.0f;
@@ -101,6 +101,7 @@ public:
     void const check_collision_y(Map* map);
     void const check_collision_x(Map* map);
 
+    
     void move_left()    { m_movement.x = -1.0f; };
     void move_right()   { m_movement.x = 1.0f; };
     void move_up()      { m_movement.y = 1.0f; };
@@ -119,7 +120,7 @@ public:
     EntityType const get_entity_type()    const { return m_entity_type;     };
     AIType     const get_ai_type()        const { return m_ai_type;         };
     AIState    const get_ai_state()       const { return m_ai_state;        };
-    glm::vec3  const get_position()       const { return m_position;        };
+    glm::vec3  get_position()   { return m_position;        };
     glm::vec3  const get_movement()       const { return m_movement;        };
     glm::vec3  const get_velocity()       const { return m_velocity;        };
     glm::vec3  const get_acceleration()   const { return m_acceleration;    };

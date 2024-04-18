@@ -21,7 +21,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "ShaderProgram.h"
-#include "Util.h"
+#include "Utility.h"
 #include "Entity.h"
 #include "Map.h"
 
@@ -44,11 +44,12 @@ class Scene {
 public:
     // ————— ATTRIBUTES ————— //
     int m_number_of_enemies = 1;
+    int n_lives = 3;
     
     GameState m_state;
     
     // ————— METHODS ————— //
-    virtual void initialise() = 0;
+    virtual void initialise(int lives) = 0;
     virtual void update(float delta_time) = 0;
     virtual void render(ShaderProgram *program) = 0;
     

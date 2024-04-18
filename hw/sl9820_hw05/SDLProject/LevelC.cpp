@@ -8,13 +8,13 @@
 * Academic Misconduct.
 **/
 
-#include "LevelC.hpp"
+#include "LevelC.h"
 #include "Utility.h"
 
 #define LEVEL_WIDTH 17
 #define LEVEL_HEIGHT 8
 
-unsigned int LEVEL_DATA[] =
+unsigned int LEVELC_DATA[] =
 {
 
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
@@ -24,7 +24,7 @@ unsigned int LEVEL_DATA[] =
     36,  0,  0,  1,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 36,
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 36,
     36,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 82,  0,  0,  0,  0, 36,
-    36, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,  0, 36
+    36, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19,  0, 36
 };
 
 LevelC::~LevelC()
@@ -37,10 +37,12 @@ LevelC::~LevelC()
 
 }
 
-void LevelC::initialise()
+void LevelC::initialise(int lives)
 {
+    m_state.next_scene_id = -1;
+    n_lives = lives;
     GLuint map_texture_id = Utility::load_texture("assets/tileset.png");
-    m_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_DATA, map_texture_id, 1.0f, 16, 7);
+    m_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVELC_DATA, map_texture_id, 1.0f, 16, 7);
     
     // Code from main.cpp's initialise()
     /**
@@ -140,20 +142,19 @@ void LevelC::update(float delta_time)
         m_state.enemies[i].update(delta_time, m_state.player, NULL, NULL, m_state.map);
     }
     
-    int temp_count = 0;
-    for (size_t i = 0; i < ENEMY_COUNT ; i++){
-        if (!m_state.enemies[i].isActive()) temp_count++;
+    if (!(m_state.player->isActive())){
+        n_lives -= 1;
+        if (n_lives <= 0) {
+            m_state.next_scene_id = 4;
+        } else {
+            m_state.player->activate();
+            m_state.player->set_position(glm::vec3(1.0f, 0.0f, 0.0f));
+        }
+        return;
     }
+    if (m_state.player->get_position().y < -10.0f) m_state.next_scene_id = 5;
     
-    if (m_state.player->get_position().y < -10.0f) {
-        gamewin = true;
-    }
 
-    if (m_state.player->lives <= 0) game_over = true;
-}
-
-bool LevelA::game_done(){
-    return game_over or game_won;
 }
 
 
@@ -168,14 +169,9 @@ void LevelC::render(ShaderProgram *program)
             m_state.enemies[i].render(program);
         }
     }
-    Utility::draw_text(program, font_texture_id, std::to_string(m_state.player->lives), 0.5f, 0.0f, m_state.player->get_position());
-
-    if (game_over){
-        Utility::draw_text(program, font_texture_id, std::string("You Lose"), 0.5f, 0.0f, m_state.player->get_position());
-    }
-    if (game_won){
-        Utility::draw_text(program, font_texture_id, std::string("You Win"), 0.5f, 0.0f, m_state.player->get_position());
-    }
+    
+    Utility::draw_text(program, font_texture_id, std::to_string(n_lives), 0.5f, 0.0f, m_state.player->get_position());
+    
     
 }
 
