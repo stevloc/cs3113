@@ -42,7 +42,7 @@ private:
     GLuint m_fragment_shader;
     
 public:
-
+    
     void load(const char *vertex_shader_file, const char *fragment_shader_file);
 
     void set_model_matrix(const glm::mat4 &matrix);
